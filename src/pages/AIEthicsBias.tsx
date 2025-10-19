@@ -2,12 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import Header from "@/components/Header";
-import Navigation from "@/components/Navigation";
+import DesktopNavigation from "@/components/layout/DesktopNavigation";
 import WorkshopStations from "@/components/WorkshopStations";
 import ArticleViewer from "@/components/ArticleViewer";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import { 
+import { useMemo, useState } from "react";
+import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
@@ -16,25 +16,102 @@ import {
   ChevronDown,
   ChevronUp
 } from "lucide-react";
+import LessonStepper, { LessonBlock } from "@/components/lessons/LessonStepper";
+import { useAppProgress } from "@/hooks/useAppProgress";
 
 const AIEthicsBias = () => {
   const title = "AI Ethics & Bias";
   const [isReferencesOpen, setIsReferencesOpen] = useState(false);
   const [convivialArticleOpen, setConvivialArticleOpen] = useState(false);
+  const { moduleStates, completeModule } = useAppProgress();
+
+  const lessonBlocks = useMemo<LessonBlock[]>(
+    () => [
+      {
+        id: "overview",
+        title: "Frame the ethics landscape",
+        summary: "Ground your exploration in the three dimensions guiding this module.",
+        estimatedTime: "3 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Start with a shared vocabulary and understand why environmental impact, relational dynamics, and algorithmic bias matter in arts and design contexts.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#ethics-overview">Jump to overview</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "stations",
+        title: "Work the critical stations",
+        summary: "Move through interactive prompts and case studies with your team.",
+        estimatedTime: "12-15 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Use the mobile-ready stations to document observations, debate trade-offs, and capture commitments you can carry into your prototype planning.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#stations">Open stations</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "convivial",
+        title: "Interrogate convivial tools",
+        summary: "Apply the Convivial Tools framework to ChatGPT and similar systems.",
+        estimatedTime: "8 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Read and annotate the companion article to practice making evidence-informed arguments about when and how to deploy AI responsibly.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#convivial">Read the analysis</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "references",
+        title: "Bookmark your sources",
+        summary: "Capture the citations and data sets that support your position.",
+        estimatedTime: "5 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Download the references bundle so you can cite impact data in proposals, grant applications, or class materials.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#references">View references</a>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <DesktopNavigation />
       <Header
         title={title}
         subtitle="CPAD AI Builders Toolkit"
       />
 
+      <div className="mx-auto max-w-3xl px-4 md:hidden">
+        <LessonStepper lessonId="ai-ethics" blocks={lessonBlocks} />
+      </div>
+
       {/* Main Content */}
       <div className="relative">
 
         {/* AI Ethics Section */}
-        <section className="py-12">
+        <section id="ethics-overview" className="py-12">
           <div className="max-w-6xl mx-auto px-6">
             <Card className="rounded-2xl border border-white/40 bg-card/80 shadow-lg shadow-primary/10 backdrop-blur mb-8">
               <CardContent className="p-8 space-y-5">
@@ -54,14 +131,14 @@ const AIEthicsBias = () => {
         </section>
 
         {/* Workshop Stations */}
-        <section className="py-8 bg-gradient-to-b from-background to-background/50">
+        <section id="stations" className="py-8 bg-gradient-to-b from-background to-background/50">
           <div className="max-w-6xl mx-auto px-6">
             <WorkshopStations />
           </div>
         </section>
 
         {/* Convivial Tools Article - Above References */}
-        <section className="py-12">
+        <section id="convivial" className="py-12">
           <div className="max-w-6xl mx-auto px-6">
             <Collapsible open={convivialArticleOpen} onOpenChange={setConvivialArticleOpen}>
               <Card className="rounded-2xl border-accent/20 bg-accent/5">
@@ -89,7 +166,7 @@ const AIEthicsBias = () => {
         </section>
 
         {/* References Section */}
-        <section className="py-12">
+        <section id="references" className="py-12">
           <div className="max-w-6xl mx-auto px-6">
             <Collapsible open={isReferencesOpen} onOpenChange={setIsReferencesOpen}>
               <div className="bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden">
@@ -132,6 +209,19 @@ const AIEthicsBias = () => {
             </Collapsible>
           </div>
         </section>
+
+        <div className="hidden justify-end px-6 md:flex">
+          <Button
+            variant="outline"
+            size="lg"
+            className="gap-2"
+            onClick={() => completeModule("ai-ethics")}
+            disabled={moduleStates["ai-ethics"]?.completed}
+          >
+            {moduleStates["ai-ethics"]?.completed ? "Module completed" : "Mark module complete"}
+            <Users className="h-4 w-4" />
+          </Button>
+        </div>
 
         {/* Navigation */}
         <section className="py-12 bg-gradient-to-b from-background/50 to-background">

@@ -1,364 +1,340 @@
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import DesktopNavigation from "@/components/layout/DesktopNavigation";
 import InteractiveBackground from "@/components/InteractiveBackground";
 import { PrototypeSubmissionForm } from "@/components/PrototypeSubmissionForm";
+import { SkillCardStack } from "@/components/home/SkillCardStack";
 import cpadLogo from "@/assets/cpad-logo-new.png";
-import { 
-  Mail, 
-  Video, 
-  Calendar, 
-  FileText, 
-  ExternalLink,
-  BookOpen,
-  Clock,
-  Users,
-  Target,
-  Lightbulb,
-  Zap,
+import { learningModules } from "@/lib/learningModules";
+import { useAppProgress } from "@/hooks/useAppProgress";
+import {
   ArrowRight,
-  Sparkles,
-  Home as HomeIcon,
-  Shield,
-  Image,
-  Code,
-  Bot,
+  Lightbulb,
+  Clock,
   Palette,
-  ChevronRight,
-  Send
+  Users,
+  BookOpenCheck,
+  Target,
+  MessageCircle,
+  Send,
+  Sparkles,
 } from "lucide-react";
 
+const reflectionPrompts = [
+  {
+    icon: Lightbulb,
+    text: "What's the teaching challenge you're energized to solve this semester?",
+  },
+  {
+    icon: Clock,
+    text: "Where could AI help you reclaim time for deeper feedback or creative work?",
+  },
+  {
+    icon: Palette,
+    text: "If you had a co-designer, what kind of experience would you craft for your learners?",
+  },
+  {
+    icon: Users,
+    text: "How might students benefit if a prototype removed one major barrier they face today?",
+  },
+];
+
+const moduleCards = learningModules.filter((module) => module.id !== "home" && module.id !== "gallery");
+
 const Home = () => {
-  const [reflection, setReflection] = useState<string>('');
+  const { reflection, saveReflection, nextModuleId, completionRate, streakCount } = useAppProgress();
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
+  const [isReflectionExpanded, setIsReflectionExpanded] = useState(false);
 
-  useEffect(() => {
-    const saved = localStorage.getItem('faculty-reflection');
-    if (saved) setReflection(saved);
-  }, []);
+  const nextModule = useMemo(
+    () => (nextModuleId ? learningModules.find((module) => module.id === nextModuleId) : null),
+    [nextModuleId]
+  );
 
-  const saveReflection = (text: string) => {
-    localStorage.setItem('faculty-reflection', text);
-    setReflection(text);
-  };
-  
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      {/* Hero Section */}
-      <section className="text-primary-foreground relative overflow-hidden py-12 md:py-16 lg:py-20">
-        {/* Enhanced background with consistent primary color */}
-        <div className="absolute inset-0 bg-primary"></div>
-        
-        {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='1.5'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundRepeat: 'repeat'
-          }}></div>
+    <div className="min-h-screen bg-slate-950 text-slate-50">
+      <DesktopNavigation />
+
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950" />
+          <div className="absolute inset-0 opacity-70">
+            <InteractiveBackground />
+          </div>
         </div>
 
-        {/* Interactive Background */}
-        <InteractiveBackground />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
-            {/* Left Side - Main Title */}
-            <div className="space-y-6 sm:space-y-8">
-              <div className="space-y-4 sm:space-y-6">
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.85] tracking-tight">
-                  <span className="block bg-gradient-to-r from-white via-white to-white/90 bg-clip-text text-transparent drop-shadow-2xl">
-                    AI Builders
-                  </span>
-                  <span className="block bg-gradient-to-r from-white/95 via-white to-white/90 bg-clip-text text-transparent drop-shadow-2xl">
-                    Toolkit
-                  </span>
-                </h1>
-                
-                <div className="space-y-2 sm:space-y-3">
-                  <p className="text-xl md:text-2xl lg:text-3xl text-white/70 font-light leading-relaxed">
-                    A comprehensive resource for building AI literacy, exploring Gen-AI tools, and prototyping solutions to problems.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Button 
-                  size="lg" 
-                  variant="secondary" 
-                  className="bg-white text-primary hover:bg-white/90"
-                  onClick={() => document.getElementById('start-with-problem')?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  <span className="flex items-center gap-2">
-                    Start with Your Problem
-                    <ArrowRight className="w-4 h-4" />
-                  </span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Right Side - Facilitator Info */}
-            <div className="space-y-8 lg:pl-8">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <h3 className="text-xl font-semibold text-primary-foreground mb-6">Workshop Facilitator</h3>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mt-1">
-                      <span className="text-white text-lg">👨‍🏫</span>
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-primary-foreground mb-1">Dr. Jacob Holster</h4>
-                      <p className="text-primary-foreground/80 text-sm mb-2">Assistant Teaching Professor of Music Education and Coordinator of the Center for Pedagogy in Arts & Design</p>
-                      <a href="mailto:jbh6331@psu.edu" className="text-primary-foreground/70 hover:text-primary-foreground/90 transition-colors">
-                        jbh6331@psu.edu
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-4 pb-20 pt-24 md:flex-row md:items-center md:gap-24">
+          <div className="space-y-6">
+            <Badge className="bg-white/15 text-white">
+              CPAD Learning Companion
+            </Badge>
+            <h1 className="text-4xl font-semibold leading-tight md:text-6xl">AI Builders Toolkit</h1>
+            <p className="text-lg text-slate-200 md:text-xl">
+              Move through focused cards, capture your insights, and rally CPAD support to bring an AI-enabled prototype to life.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Button
+                size="lg"
+                className="bg-white text-slate-900 hover:bg-white/90"
+                onClick={() => document.getElementById("skill-pane")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                Launch the deck
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10" asChild>
+                <a href="https://forms.gle/71sL56MFsKo1WTKR8" target="_blank" rel="noopener noreferrer">
+                  Request CPAD coaching
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
             </div>
           </div>
+
+          <Card className="w-full max-w-md border-white/20 bg-white/10 text-white backdrop-blur">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold">Your momentum</CardTitle>
+              <CardDescription className="text-slate-200/80">
+                {streakCount > 0
+                  ? `Day ${streakCount} and counting. The next card keeps the streak going.`
+                  : "Take the first card and we’ll track your streak."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-white/70">Completion</p>
+                <div className="mt-2 flex items-baseline gap-3">
+                  <span className="text-4xl font-semibold text-white">{completionRate}%</span>
+                  <span className="text-sm text-white/70">of the pathway</span>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-white/20 bg-white/10 p-4 text-sm text-white">
+                <p className="text-xs uppercase tracking-wide text-white/60">Next up</p>
+                <p className="mt-2 text-base font-medium">
+                  {nextModule ? nextModule.title : "Prototype Planner"}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
 
-      {/* New White Background Section */}
-      <section className="bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 lg:py-20 space-y-12 md:space-y-16">
-          
-          {/* Start with Your Problem - Reflection Section */}
-          <div id="start-with-problem">
-            <Card className="rounded-2xl border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-              <CardContent className="p-5 sm:p-6 lg:p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <Sparkles className="w-7 h-7 text-primary" />
-                  <h2 className="text-3xl font-bold text-foreground">Start with Your Problem</h2>
-                </div>
-                <p className="text-muted-foreground mb-6 sm:mb-8 text-base sm:text-lg leading-relaxed">
-                  The best way to explore AI is by connecting it to real challenges. Take a moment to reflect on your goals.
-                </p>
-                
-                {/* Reflection Prompts */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
-                  <Card className="border-accent/30 bg-card/50">
-                    <CardContent className="p-4 sm:p-5">
-                      <div className="flex items-start gap-3">
-                        <Lightbulb className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-                        <p className="text-sm text-foreground">What teaching challenge or workflow friction do you face most often?</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-accent/30 bg-card/50">
-                    <CardContent className="p-5">
-                      <div className="flex items-start gap-3">
-                        <Clock className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-                        <p className="text-sm text-foreground">What tasks take you the most time that AI might help streamline?</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-accent/30 bg-card/50">
-                    <CardContent className="p-5">
-                      <div className="flex items-start gap-3">
-                        <Palette className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-                        <p className="text-sm text-foreground">What would you create for your class if you had unlimited time and skills?</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-accent/30 bg-card/50">
-                    <CardContent className="p-5">
-                      <div className="flex items-start gap-3">
-                        <Users className="w-5 h-5 text-accent mt-1 flex-shrink-0" />
-                        <p className="text-sm text-foreground">How might your students benefit from AI-enhanced learning experiences?</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Reflection Textarea */}
-                <div className="mb-6 sm:mb-8">
-                  <label className="block text-sm sm:text-base font-medium text-foreground mb-3">Your Thoughts:</label>
-                  <Textarea 
-                    placeholder="Example: My students struggle to stay engaged during music history lectures. I spend hours creating presentation slides, but I wonder if AI could help me generate more interactive content or create virtual 'listening guides' that make the material more accessible..."
-                    value={reflection}
-                    onChange={(e) => saveReflection(e.target.value)}
-                    className="min-h-[100px] sm:min-h-[120px] bg-background/50 border-border text-base"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Toolkit Overview & Navigation Guide */}
-          <div>
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-foreground mb-3">Navigate the Toolkit</h2>
-              <p className="text-muted-foreground text-lg">
-                This workshop contains 6 interconnected modules. Start anywhere based on your interests and needs.
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-16 px-4 pb-24">
+        <section id="skill-pane" className="-mt-12 rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-[0_40px_80px_-40px_rgba(15,23,42,0.9)] backdrop-blur">
+          <div className="flex flex-col gap-3 pb-6 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-semibold text-white">Single-pane skill deck</h2>
+              <p className="max-w-2xl text-sm text-slate-300 md:text-base">
+                Tap a card to dive in, shuffle for a fresh spark, or run the modules in sequence. Every card jumps straight to the full lesson or planner move it references.
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6">
-              {/* AI Literacy Checklist */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <HomeIcon className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">AI Literacy Checklist</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Develop essential AI literacy skills through 5 interactive modules: prompt engineering fundamentals, understanding capabilities and limitations, critical evaluation, reasoning models, and extended tools like Deep Research and Agent Mode.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/week1" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <Badge variant="outline" className="border-white/30 text-white">
+              <Sparkles className="mr-2 h-4 w-4" /> Bite-sized actions
+            </Badge>
+          </div>
+          <SkillCardStack />
+        </section>
 
-              {/* AI Ethics & Bias */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <Shield className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">AI Ethics & Bias</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Examine how AI systems can perpetuate bias, explore sycophancy in language models, and develop critical perspectives on responsible AI use in educational settings.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/week3" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        <section id="reflection-section" className="grid gap-8 rounded-3xl border border-slate-800 bg-slate-900/80 p-8 backdrop-blur md:grid-cols-[1.15fr,1fr]">
+          <div className="space-y-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-3xl font-semibold text-white">Lock in your focus</h2>
+                <p className="text-slate-300">
+                  Capture the challenge you want to work on. Your notes follow you into every module.
+                </p>
+              </div>
+              <Badge variant="outline" className="border-white/20 text-white">
+                <BookOpenCheck className="mr-2 h-4 w-4" /> Guided reflection
+              </Badge>
+            </div>
 
-              {/* Vibecoding */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <Code className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Vibecoding</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Build interactive educational games, websites, and learning modules using AI-assisted development platforms like Lovable. No traditional coding experience required.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/week6" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {reflectionPrompts.map((prompt) => (
+                <Card key={prompt.text} className="border-white/10 bg-slate-950/60 text-white">
+                  <CardContent className="flex items-start gap-3 p-4">
+                    <prompt.icon className="h-5 w-5 text-primary" />
+                    <p className="text-sm text-slate-200">{prompt.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
 
-              {/* Storytelling */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <Image className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Storytelling with AI</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Create compelling visual content using AI image generation tools like Midjourney and Kling. Learn diffusion model workflows and develop multimedia materials for your courses.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/week4" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Custom GPTs */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <Bot className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Custom GPTs</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Design specialized AI assistants tailored to your teaching needs. Create custom chatbots for grading support, lesson planning, research assistance, and student feedback.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/custom-gpts" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Assignment Ideas */}
-              <Card className="rounded-2xl border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-5 sm:p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="p-3 bg-accent/20 rounded-xl flex-shrink-0">
-                      <Lightbulb className="w-6 h-6 text-accent" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Prototype Planner</h3>
-                      <p className="text-sm sm:text-base text-muted-foreground mb-4 leading-relaxed">Transform your teaching challenges into actionable prototypes. Get AI-powered guidance on tools, approaches, and next steps to build your ideas.</p>
-                      <Button variant="outline" className="min-h-[44px]" asChild>
-                        <Link to="/prototype-planner" className="flex items-center gap-2">
-                          Explore <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="space-y-2">
+              <label htmlFor="reflection" className="text-sm font-medium text-white">
+                Your notes
+              </label>
+              <Textarea
+                id="reflection"
+                value={reflection}
+                onChange={(event) => saveReflection(event.target.value)}
+                placeholder="I'm noticing my students need..."
+                className="min-h-[160px] border-white/10 bg-slate-950/70 text-white placeholder:text-slate-500 focus:border-white/40 focus:ring-white/30"
+              />
             </div>
           </div>
 
-        </div>
-      </section>
+          <div className="flex flex-col gap-6">
+            <Card className="border-white/10 bg-slate-950/70 text-white">
+              <CardContent className="space-y-3 p-6">
+                <h3 className="text-lg font-semibold">Pocket preview</h3>
+                <p className="text-sm text-slate-300">
+                  The reflection collapses into a single card inside the deck. Toggle the preview to check how it appears.
+                </p>
+                <Button
+                  variant="secondary"
+                  className="w-full border-white/20 bg-white/10 text-white hover:bg-white/20"
+                  onClick={() => setIsReflectionExpanded(!isReflectionExpanded)}
+                >
+                  {isReflectionExpanded ? "Hide preview" : "Preview reflection card"}
+                </Button>
+                {isReflectionExpanded && (
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4 text-sm text-slate-200">
+                    <p className="font-medium text-white">Your focus</p>
+                    <p className="mt-2">
+                      {reflection ? reflection : "Capture a sentence above and it will appear here across the toolkit."}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-      {/* Submit for Feedback Banner */}
-      <section className="py-16 md:py-20 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-3 text-primary mb-4">
-            <Send className="h-6 w-6" />
+            <Card className="border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 text-white">
+              <CardContent className="flex items-center gap-4 p-6">
+                <img
+                  src={cpadLogo}
+                  alt="CPAD"
+                  className="h-16 w-16 rounded-2xl border border-white/20 bg-white/90 p-3"
+                />
+                <div>
+                  <h3 className="text-lg font-semibold">Design with CPAD</h3>
+                  <p className="text-sm text-slate-200">
+                    Share where you're stuck and request feedback. The support form routes your note directly to the CPAD team.
+                  </p>
+                </div>
+              </CardContent>
+              <div className="border-t border-white/10 bg-white/5 p-4">
+                <Button asChild className="w-full bg-white text-slate-900 hover:bg-white/90">
+                  <a href="https://forms.gle/71sL56MFsKo1WTKR8" target="_blank" rel="noopener noreferrer">
+                    Open the CPAD support form
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </a>
+                </Button>
+              </div>
+            </Card>
           </div>
-          <h2 className="text-3xl font-semibold text-ink mb-4">
-            Built Something? Get Feedback!
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-            Share your prototype with the workshop facilitators for personalized feedback 
-            and a chance to be featured in our community gallery.
-          </p>
-          <Button 
-            size="lg" 
-            onClick={() => setIsSubmissionOpen(true)}
-            className="flex items-center justify-center gap-2 mx-auto"
-          >
-            <Send className="h-5 w-5" />
-            Submit for Feedback
-          </Button>
-        </div>
-      </section>
+        </section>
 
-      {/* Submission Dialog */}
+        <section className="space-y-10 rounded-3xl border border-slate-800 bg-slate-900/80 p-8 backdrop-blur">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-semibold text-white">Full modules</h2>
+              <p className="text-slate-300">
+                Use the deck for fast actions and open these modules when you're ready to unpack the full experience.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="border-white/20 text-white">
+                <Target className="mr-2 h-4 w-4" /> Sequential path
+              </Badge>
+              <Badge variant="outline" className="border-white/20 text-white">
+                <MessageCircle className="mr-2 h-4 w-4" /> Project prompts
+              </Badge>
+            </div>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {moduleCards.map((module) => {
+              const Icon = module.icon;
+              return (
+                <Card
+                  key={module.id}
+                  className="border-white/10 bg-slate-950/70 text-white transition-transform hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(15,23,42,1)]"
+                >
+                  <CardContent className="flex flex-col gap-4 p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
+                        <Icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold">{module.title}</h3>
+                        <p className="text-sm text-slate-300">{module.summary}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-slate-300">
+                      <span>{module.estimatedTime}</span>
+                      <Button variant="secondary" className="bg-white/10 text-white hover:bg-white/20" asChild>
+                        <Link to={module.route} className="flex items-center gap-2 text-sm font-medium">
+                          Open module
+                          <ArrowRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="grid gap-8 rounded-3xl border border-slate-800 bg-slate-900/80 p-8 backdrop-blur md:grid-cols-[1.1fr,1fr]">
+          <Card className="border-white/10 bg-slate-950/70 text-white">
+            <CardHeader>
+              <CardTitle>Submit your prototype for feedback</CardTitle>
+              <CardDescription className="text-slate-300">
+                When you're ready, share your progress. CPAD will review your concept, connect you with collaborators, and help you iterate.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-slate-300">
+                Attach lesson materials, prototypes, or reflections. We'll respond with tailored support that keeps your project moving.
+              </p>
+              <Button size="lg" className="bg-white text-slate-900 hover:bg-white/90" onClick={() => setIsSubmissionOpen(true)}>
+                Launch submission form
+                <Send className="ml-2 h-4 w-4" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-slate-950/70 text-white">
+            <CardContent className="flex h-full flex-col justify-between gap-4 p-6">
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">What happens after you submit?</h3>
+                <ul className="space-y-2 text-sm text-slate-300">
+                  <li>• CPAD reviews your materials within 2–3 days.</li>
+                  <li>• You'll receive tailored resources or an invite for a design consult.</li>
+                  <li>• Your project can be featured in the gallery when you're ready.</li>
+                </ul>
+              </div>
+              <div className="rounded-2xl border border-dashed border-white/20 p-4 text-sm text-slate-200">
+                Prefer email? Reach us at
+                {" "}
+                <a className="font-medium text-white" href="mailto:jbh6331@psu.edu">
+                  jbh6331@psu.edu
+                </a>
+                .
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </main>
+
       <Dialog open={isSubmissionOpen} onOpenChange={setIsSubmissionOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Submit Your Prototype</DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              Share your work and get personalized feedback from our team.
+            <DialogTitle>Submit your prototype</DialogTitle>
+            <DialogDescription>
+              Share a snapshot of your work so CPAD can provide targeted support.
             </DialogDescription>
           </DialogHeader>
           <PrototypeSubmissionForm onSuccess={() => setIsSubmissionOpen(false)} />
