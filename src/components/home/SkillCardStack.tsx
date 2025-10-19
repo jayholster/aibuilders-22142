@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { skillCards } from "@/data/skillCards";
 import { learningModules } from "@/lib/learningModules";
-import { cn } from "@/lib/utils";
 import { Shuffle, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
 
 const moduleThemes: Record<
@@ -110,12 +109,11 @@ export const SkillCardStack = () => {
             key={item.id}
             variant="ghost"
             size="sm"
-            className={cn(
-              "rounded-full border px-4",
+            className={`rounded-full border px-4 ${
               item.id === filter
                 ? "border-white/30 bg-white/20 text-white"
                 : "border-white/10 text-slate-300 hover:bg-white/10"
-            )}
+            }`}
             onClick={() => {
               setFilter(item.id);
               setIndex(0);
@@ -153,10 +151,7 @@ export const SkillCardStack = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  "text-white/80 hover:bg-white/20",
-                  completedCards.has(currentCard.id) && "bg-white/20 text-white"
-                )}
+                className={`text-white/80 hover:bg-white/20 ${completedCards.has(currentCard.id) ? "bg-white/20 text-white" : ""}`}
                 onClick={() => toggleCompletion(currentCard.id)}
               >
                 <CheckCircle2 className="h-5 w-5" />
@@ -175,10 +170,7 @@ export const SkillCardStack = () => {
               {currentCard.highlights.map((highlight) => (
                 <span
                   key={highlight}
-                  className={cn(
-                    "rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide text-white",
-                    theme?.accent ?? "bg-white/15"
-                  )}
+                  className={`rounded-full px-3 py-1 text-xs font-medium uppercase tracking-wide text-white ${theme?.accent ?? "bg-white/15"}`}
                 >
                   {highlight}
                 </span>
