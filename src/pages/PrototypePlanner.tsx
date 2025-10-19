@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import Navigation from "@/components/Navigation";
+import DesktopNavigation from "@/components/layout/DesktopNavigation";
 import Header from "@/components/Header";
 import { PrototypePlanner as PrototypePlannerComponent } from "@/components/PrototypePlanner";
 import { PrototypeSubmissionForm } from "@/components/PrototypeSubmissionForm";
@@ -22,7 +22,7 @@ const PrototypePlanner = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <DesktopNavigation />
       <Header
         title="Prototype Planner"
         subtitle="CPAD AI Builders Toolkit"
