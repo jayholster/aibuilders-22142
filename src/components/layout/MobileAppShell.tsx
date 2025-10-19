@@ -68,6 +68,7 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
   const resumeLabel = getModuleLabel(lastVisitedModuleId);
 
   return (
+
     <div className="min-h-screen bg-slate-950 text-slate-50">
       <div className="pb-28 md:pb-0">{children}</div>
 
@@ -78,6 +79,18 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-400">Progress</span>
                 <Badge variant="outline" className="border-white/15 text-[10px] uppercase tracking-wide text-white">
+
+    <div className="min-h-screen bg-background">
+      <div className="pb-24 md:pb-0">{children}</div>
+
+      {renderMobileChrome && (
+        <>
+          <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border/70 bg-background/95 backdrop-blur">
+            <div className="flex items-center justify-between px-3 pt-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Progress</span>
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+
                   {streakCount > 0 ? `${streakCount}-day streak` : "Let's begin"}
                 </Badge>
               </div>
@@ -85,7 +98,11 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
                 <Button
                   variant="ghost"
                   size="sm"
+
                   className="text-xs text-slate-200 hover:bg-white/10"
+
+                  className="text-xs"
+
                   onClick={() => {
                     const resumeModule = learningModules.find((module) => module.id === lastVisitedModuleId);
                     if (resumeModule) {
@@ -98,10 +115,17 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
               )}
             </div>
 
+
             <div className="px-3 pb-3">
               <Progress value={completionRate} className="h-1.5 bg-slate-800" />
               <div className="mt-2 flex items-center justify-between text-[11px] uppercase tracking-wide text-slate-400">
                 <span className="text-slate-200">{activeLabel}</span>
+
+            <div className="px-3 pb-2">
+              <Progress value={completionRate} className="h-1.5" />
+              <div className="mt-1 flex items-center justify-between text-[10px] uppercase tracking-wide text-muted-foreground">
+                <span>{activeLabel}</span>
+
                 <span>{completionRate}% complete</span>
               </div>
             </div>
@@ -123,6 +147,15 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
                   >
                     <Icon className="h-4 w-4" />
                     <span className="text-[10px] leading-tight text-center">{module.title.split(" ")[0]}</span>
+                    variant={isActive ? "default" : "ghost"}
+                    size="sm"
+                    className={`flex-1 flex-col gap-1 py-2 text-xs ${isActive ? "" : "text-muted-foreground"}`}
+                    onClick={() => navigate(module.route)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-[10px] font-medium leading-tight text-center">
+                      {module.title.split(" ")[0]}
+                    </span>
                   </Button>
                 );
               })}
@@ -132,6 +165,9 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
               <div className="border-t border-slate-800/70 bg-slate-900/80 px-3 py-2">
                 <Button
                   className="w-full rounded-2xl bg-white text-slate-900 hover:bg-white/90"
+              <div className="border-t border-border/50 bg-muted/50 px-3 py-2">
+                <Button
+                  className="w-full text-sm"
                   onClick={() => {
                     const nextModule = learningModules.find((module) => module.id === nextModuleId);
                     if (nextModule) {
@@ -172,6 +208,23 @@ export const MobileAppShell = ({ children }: { children: ReactNode }) => {
                       className="mt-4 w-full rounded-2xl bg-white text-slate-900 hover:bg-white/90"
                       onClick={() => setIsOnboardingVisible(false)}
                     >
+            <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm transition-opacity">
+              <div className="absolute inset-x-4 bottom-32 space-y-4">
+                <Card className="border-primary/40 bg-background/95">
+                  <CardContent className="p-5">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">CPAD Learning Companion</p>
+                        <h2 className="text-lg font-semibold">One tap at a time</h2>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={() => setIsOnboardingVisible(false)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Swipe through each chapter, capture your ideas, and reach out for CPAD coaching whenever you need a co-pilot.
+                    </p>
+                    <Button className="mt-4 w-full" onClick={() => setIsOnboardingVisible(false)}>
                       Start exploring
                     </Button>
                   </CardContent>
