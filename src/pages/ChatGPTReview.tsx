@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Header from "@/components/Header";
-import Navigation from "@/components/Navigation";
+import DesktopNavigation from "@/components/layout/DesktopNavigation";
 import CourseTimeline from "@/components/CourseTimeline";
 import TaskChecklist from "@/components/TaskChecklist";
 import ReasoningModelsComparison from "@/components/ReasoningModelsComparison";
@@ -43,11 +43,84 @@ import {
   Paperclip,
   Link as LinkIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import LessonStepper, { LessonBlock } from "@/components/lessons/LessonStepper";
+import { useAppProgress } from "@/hooks/useAppProgress";
 
 const ChatGPTReview = () => {
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [articleOpen, setArticleOpen] = useState(false);
+  const { moduleStates, completeModule } = useAppProgress();
+
+  const lessonBlocks = useMemo<LessonBlock[]>(
+    () => [
+      {
+        id: "orient",
+        title: "Orient yourself",
+        summary: "Review the big picture, expected outcomes, and timeline for the journey.",
+        estimatedTime: "3 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Start by grounding in the purpose of the AI Builders Toolkit. You'll revisit the outcomes and see how each activity connects back to your teaching challenge.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#overview">Jump to overview</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "skills",
+        title: "Build essential skills",
+        summary: "Work through hands-on labs that sharpen prompting, evaluation, and reasoning.",
+        estimatedTime: "10-15 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Explore the interactive lab set that turns abstract ideas into muscle memory—prompting, capabilities, evaluation, reasoning, and extended tools.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#skills">Open the interactive labs</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "practice",
+        title: "Plan classroom moves",
+        summary: "Use checklists, rubrics, and workshop prompts to translate literacy into teaching practice.",
+        estimatedTime: "10 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Move from ideas to action with ready-to-use checklists, lesson prompts, and student-facing frameworks. These resources help you prepare artifacts you can immediately implement.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#practice">Review implementation tools</a>
+            </Button>
+          </div>
+        ),
+      },
+      {
+        id: "extend",
+        title: "Extend your toolkit",
+        summary: "Dive into curated AI tools, research paths, and authentic classroom examples.",
+        estimatedTime: "8-12 min",
+        content: (
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <p>
+              Stay curious by exploring featured articles, research resources, and playlists of AI tools. Capture which ones will support your prototype.
+            </p>
+            <Button size="sm" variant="outline" asChild>
+              <a href="#extend-tools">Explore extension resources</a>
+            </Button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
   const copyUrl = async (url: string) => {
     try {
@@ -104,17 +177,21 @@ const ChatGPTReview = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <Header 
+      <DesktopNavigation />
+
+      <Header
         title="AI Literacy Checklist"
         subtitle="CPAD AI Builders Toolkit"
       />
 
+      <div className="mx-auto max-w-3xl px-4 md:hidden">
+        <LessonStepper lessonId="ai-literacy" blocks={lessonBlocks} />
+      </div>
+
       <div className="max-w-6xl mx-auto px-6 py-16 md:py-20 space-y-16">
         
         {/* Welcome Introduction */}
-        <section>
+        <section id="overview">
           <Card className="rounded-2xl border-primary/30 bg-gradient-to-br from-primary/10 to-accent/5">
             <CardContent className="p-8">
               <div className="flex items-start gap-4">
@@ -133,8 +210,48 @@ const ChatGPTReview = () => {
           </Card>
         </section>
 
+        <section id="practice" className="space-y-12">
+          <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
+            <div className="space-y-8">
+              <StatsCards />
+              <LearningOutcomes />
+            </div>
+            <Card className="border-border/60 bg-card">
+              <CardContent className="space-y-6 p-6">
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-foreground">Semester timeline snapshot</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Keep an eye on weekly deliverables while you experiment. The planner below syncs with the Prototype Planner so you can draft milestones as you advance.
+                  </p>
+                </div>
+                <div className="max-h-[360px] overflow-y-auto pr-2">
+                  <CourseTimeline />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="border-border/60 bg-muted/30">
+            <CardContent className="p-6">
+              <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h3 className="text-2xl font-semibold text-foreground">Toolkit setup checklist</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Create or confirm your accounts so every lab in this module is ready to launch on your phone.
+                  </p>
+                </div>
+                <Badge variant="outline" className="flex items-center gap-2 text-xs uppercase tracking-wide">
+                  <Clock className="h-3.5 w-3.5" />
+                  20 minutes
+                </Badge>
+              </div>
+              <TaskChecklist />
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Essential AI Literacy Skills - Interactive */}
-        <section>
+        <section id="skills">
           <Card className="rounded-2xl border-accent/20 bg-accent/5">
             <CardContent className="p-8">
               <div className="space-y-6">
@@ -216,7 +333,7 @@ const ChatGPTReview = () => {
 
 
         {/* Article Viewer */}
-        <section>
+        <section id="extend">
           <Collapsible open={articleOpen} onOpenChange={setArticleOpen}>
             <Card className="rounded-2xl border-accent/20 bg-accent/5">
               <CollapsibleTrigger className="w-full">
@@ -246,7 +363,7 @@ const ChatGPTReview = () => {
         </section>
 
         {/* Other AI Tools */}
-        <section>
+        <section id="extend-tools">
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-ink mb-6">
               Other AI Tools
@@ -297,6 +414,19 @@ const ChatGPTReview = () => {
             </div>
           </div>
         </section>
+
+        <div className="hidden justify-end md:flex">
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => completeModule("ai-literacy")}
+            disabled={moduleStates["ai-literacy"]?.completed}
+            className="gap-2"
+          >
+            {moduleStates["ai-literacy"]?.completed ? "Module completed" : "Mark module complete"}
+            <CheckCircle2 className="h-4 w-4" />
+          </Button>
+        </div>
 
       </div>
 

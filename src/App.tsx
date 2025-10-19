@@ -13,6 +13,8 @@ import PrototypePlanner from "./pages/PrototypePlanner";
 import SubmissionsAdmin from "./pages/SubmissionsAdmin";
 import Gallery from "./pages/Gallery";
 import NotFound from "./pages/NotFound";
+import { ProgressProvider } from "./hooks/useAppProgress";
+import { MobileAppShell } from "./components/layout/MobileAppShell";
 
 import { useScrollToTop } from "./hooks/useScrollToTop";
 
@@ -22,19 +24,21 @@ const AppContent = () => {
   useScrollToTop();
   
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/week1" element={<ChatGPTReview />} />
-      <Route path="/week3" element={<AIEthicsBias />} />
-      <Route path="/week4" element={<Storytelling />} />
-      <Route path="/week6" element={<Vibecoding />} />
-      <Route path="/custom-gpts" element={<CustomGPTs />} />
-      <Route path="/prototype-planner" element={<PrototypePlanner />} />
-      <Route path="/admin/submissions" element={<SubmissionsAdmin />} />
-      <Route path="/gallery" element={<Gallery />} />
-      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <MobileAppShell>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/week1" element={<ChatGPTReview />} />
+        <Route path="/week3" element={<AIEthicsBias />} />
+        <Route path="/week4" element={<Storytelling />} />
+        <Route path="/week6" element={<Vibecoding />} />
+        <Route path="/custom-gpts" element={<CustomGPTs />} />
+        <Route path="/prototype-planner" element={<PrototypePlanner />} />
+        <Route path="/admin/submissions" element={<SubmissionsAdmin />} />
+        <Route path="/gallery" element={<Gallery />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </MobileAppShell>
   );
 };
 
@@ -45,7 +49,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppContent />
+        <ProgressProvider>
+          <AppContent />
+        </ProgressProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

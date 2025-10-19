@@ -8,6 +8,7 @@ import { Phase4Prototype } from "./PrototypePlanner/Phase4Prototype";
 import { Phase5Test } from "./PrototypePlanner/Phase5Test";
 import { FinalOutput } from "./PrototypePlanner/FinalOutput";
 import { WizardFormData, Phase } from "./PrototypePlanner/types";
+import { useAppProgress } from "@/hooks/useAppProgress";
 
 interface PrototypePlannerProps {
   onSubmitForFeedback?: () => void;
@@ -48,6 +49,7 @@ export const PrototypePlanner = ({ onSubmitForFeedback }: PrototypePlannerProps 
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [completedPhases, setCompletedPhases] = useState<number[]>([]);
   const [formData, setFormData] = useState<WizardFormData>(initialFormData);
+  const { reflection, updateModuleStep, completeModule } = useAppProgress();
 
   // Load saved data from localStorage on mount
   useEffect(() => {
@@ -63,12 +65,18 @@ export const PrototypePlanner = ({ onSubmitForFeedback }: PrototypePlannerProps 
       }
     }
 
-    // Check for pre-filled problem statement from home page
-    const savedProblem = localStorage.getItem("faculty-reflection");
-    if (savedProblem && !formData.problemStatement) {
-      setFormData(prev => ({ ...prev, problemStatement: savedProblem }));
+    // Prefill problem statement from reflection store
+    if (reflection && !formData.problemStatement) {
+      setFormData(prev => ({ ...prev, problemStatement: reflection }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (reflection && !formData.problemStatement) {
+      setFormData(prev => ({ ...prev, problemStatement: reflection }));
+    }
+  }, [reflection, formData.problemStatement]);
 
   // Auto-save to localStorage whenever data changes
   useEffect(() => {
@@ -88,7 +96,7 @@ export const PrototypePlanner = ({ onSubmitForFeedback }: PrototypePlannerProps 
 
   const handleNext = () => {
     if (currentPhase === 'complete') return;
-    
+
     // Mark current phase as completed
     if (!completedPhases.includes(currentPhase as number)) {
       setCompletedPhases([...completedPhases, currentPhase as number]);
@@ -125,6 +133,14 @@ export const PrototypePlanner = ({ onSubmitForFeedback }: PrototypePlannerProps 
   const handleEditPhase = (phase: number) => {
     setCurrentPhase(phase as Phase);
   };
+
+  useEffect(() => {
+    const stepIndex = currentPhase === 'complete' ? 5 : ((currentPhase as number) - 1);
+    updateModuleStep('prototype-planner', stepIndex);
+    if (currentPhase === 'complete') {
+      completeModule('prototype-planner');
+    }
+  }, [currentPhase, updateModuleStep, completeModule]);
 
   return (
     <Card className="w-full border-2 shadow-lg">
