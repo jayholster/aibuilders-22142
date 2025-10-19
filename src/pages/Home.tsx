@@ -84,6 +84,27 @@ const reflectionPrompts = [
 
 const moduleCards = learningModules.filter((module) => module.id !== "home" && module.id !== "gallery");
 
+const reflectionPrompts = [
+  {
+    icon: Lightbulb,
+    text: "What's the teaching challenge you're energized to solve this semester?",
+  },
+  {
+    icon: Clock,
+    text: "Where could AI help you reclaim time for deeper feedback or creative work?",
+  },
+  {
+    icon: Palette,
+    text: "If you had a co-designer, what kind of experience would you craft for your learners?",
+  },
+  {
+    icon: Users,
+    text: "How might students benefit if a prototype removed one major barrier they face today?",
+  },
+];
+
+const moduleCards = learningModules.filter((module) => module.id !== "home" && module.id !== "gallery");
+
 const Home = () => {
   const { reflection, saveReflection, nextModuleId, completionRate, streakCount } = useAppProgress();
   const [isSubmissionOpen, setIsSubmissionOpen] = useState(false);
